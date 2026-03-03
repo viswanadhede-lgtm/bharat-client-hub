@@ -4,11 +4,17 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 
 interface CustomerData {
@@ -30,7 +36,7 @@ interface Props {
 export function CustomerModal({ open, onOpenChange, customer, onSuccess }: Props) {
   const isEdit = !!customer?.customer_id;
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState<CustomerData>({ name: "", phone: "", email: "", tags: "" });
+  const [form, setForm] = useState<CustomerData>({ name: "", phone: "", email: "", tags: "", status: "active" });
 
   useEffect(() => {
     if (customer) {
@@ -40,26 +46,31 @@ export function CustomerModal({ open, onOpenChange, customer, onSuccess }: Props
         email: customer.email || "",
         tags: customer.tags || "",
         customer_id: customer.customer_id,
-        status: customer.status,
+        status: customer.status || "active",
       });
     } else {
-      setForm({ name: "", phone: "", email: "", tags: "" });
+      setForm({ name: "", phone: "", email: "", tags: "", status: "active" });
     }
   }, [customer, open]);
 
-  const handleSubmit = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
+  const handleUpdate = async () => {
+    console.log("[CustomerModal] Update clicked", { isEdit, form });
+
     if (!form.name.trim() || !form.phone.trim()) {
       toast.error("Name and Phone are required");
       return;
     }
+
     setLoading(true);
     const token = localStorage.getItem("auth_token");
+    console.log("[CustomerModal] Token found:", !!token);
+
     if (!token) {
       toast.error("Not authenticated");
       setLoading(false);
       return;
     }
+
     try {
       const endpoint = isEdit
         ? "https://dev.bharathbots.com/webhook/edit-customer"
@@ -72,6 +83,7 @@ export function CustomerModal({ open, onOpenChange, customer, onSuccess }: Props
             phone: form.phone,
             email: form.email,
             tags: form.tags,
+            status: form.status,
           }
         : {
             name: form.name,
@@ -79,6 +91,8 @@ export function CustomerModal({ open, onOpenChange, customer, onSuccess }: Props
             email: form.email,
             tags: form.tags,
           };
+
+      console.log("[CustomerModal] Calling endpoint:", endpoint, "Body:", JSON.stringify(body));
 
       const res = await fetch(endpoint, {
         method: "POST",
@@ -89,7 +103,9 @@ export function CustomerModal({ open, onOpenChange, customer, onSuccess }: Props
         body: JSON.stringify(body),
       });
 
+      console.log("[CustomerModal] Response status:", res.status);
       const data = await res.json();
+      console.log("[CustomerModal] Response data:", JSON.stringify(data));
 
       if (!res.ok) {
         throw new Error(data.message || "Request failed");
@@ -105,6 +121,7 @@ export function CustomerModal({ open, onOpenChange, customer, onSuccess }: Props
       onSuccess();
       onOpenChange(false);
     } catch (err: any) {
+      console.error("[CustomerModal] Error:", err);
       toast.error(err.message || "Something went wrong");
     } finally {
       setLoading(false);
@@ -120,7 +137,7 @@ export function CustomerModal({ open, onOpenChange, customer, onSuccess }: Props
         <DialogHeader>
           <DialogTitle>{isEdit ? "Edit Customer" : "Add Customer"}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Name *</Label>
             <Input id="name" value={form.name} onChange={(e) => update("name", e.target.value)} placeholder="Full name" />
@@ -140,18 +157,26 @@ export function CustomerModal({ open, onOpenChange, customer, onSuccess }: Props
           {isEdit && (
             <div className="space-y-2">
               <Label>Status</Label>
-              <Input value={form.status || ""} disabled className="bg-muted" />
+              <Select value={form.status || "active"} onValueChange={(v) => update("status", v)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           )}
-          <DialogFooter>
+          <div className="flex justify-end gap-2 pt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="button" disabled={loading} onClick={() => handleSubmit()}>
+            <Button type="button" disabled={loading} onClick={handleUpdate}>
               {loading ? "Saving..." : isEdit ? "Update" : "Create"}
             </Button>
-          </DialogFooter>
-        </form>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );
