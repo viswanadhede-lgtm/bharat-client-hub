@@ -32,13 +32,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       body: JSON.stringify({ email, password: hashedPassword }),
     });
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || "Invalid credentials");
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok || data.success === false) {
+      throw new Error(data.message || "Invalid credentials");
     }
 
-    const data: AuthResponse = await res.json();
-    storeAuth(data);
+    storeAuth(data as AuthResponse);
     setUser(data.user);
   };
 
