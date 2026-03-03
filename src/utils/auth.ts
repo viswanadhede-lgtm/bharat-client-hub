@@ -2,20 +2,32 @@ export interface AuthUser {
   user_id: string;
   company_id: string;
   branch_id: string;
-  role: string;
+  role?: string;
 }
 
-export interface AuthResponse {
-  token: string;
-  user: AuthUser;
-}
-
-const TOKEN_KEY = "bb_token";
+const TOKEN_KEY = "auth_token";
 const USER_KEY = "bb_user";
 
-export function storeAuth(data: AuthResponse) {
-  localStorage.setItem(TOKEN_KEY, data.token);
-  localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+export function decodeToken(token: string): AuthUser | null {
+  try {
+    const decoded = JSON.parse(atob(token));
+    return {
+      user_id: decoded.user_id,
+      company_id: decoded.company_id,
+      branch_id: decoded.branch_id,
+      role: decoded.role || "admin",
+    };
+  } catch {
+    return null;
+  }
+}
+
+export function storeAuth(token: string) {
+  localStorage.setItem(TOKEN_KEY, token);
+  const user = decodeToken(token);
+  if (user) {
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+  }
 }
 
 export function getToken(): string | null {
