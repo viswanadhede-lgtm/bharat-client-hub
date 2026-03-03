@@ -47,8 +47,8 @@ export function CustomerModal({ open, onOpenChange, customer, onSuccess }: Props
     }
   }, [customer, open]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!form.name.trim() || !form.phone.trim()) {
       toast.error("Name and Phone are required");
       return;
@@ -147,7 +147,7 @@ export function CustomerModal({ open, onOpenChange, customer, onSuccess }: Props
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button type="button" disabled={loading} onClick={() => handleSubmit()}>
               {loading ? "Saving..." : isEdit ? "Update" : "Create"}
             </Button>
           </DialogFooter>
