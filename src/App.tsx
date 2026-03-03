@@ -8,7 +8,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AppLayout } from "@/components/AppLayout";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
+
 import Customers from "./pages/Customers";
 import CustomerProfile from "./pages/CustomerProfile";
 import NotFound from "./pages/NotFound";
@@ -32,7 +32,7 @@ const App = () => (
                 </ProtectedRoute>
               }
             >
-              <Route path="/dashboard" element={<Dashboard />} />
+              
               <Route path="/customers" element={<Customers />} />
               <Route path="/customers/:id" element={<CustomerProfile />} />
             </Route>
