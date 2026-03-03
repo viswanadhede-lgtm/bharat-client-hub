@@ -24,12 +24,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
-    const hashedPassword = SHA256(password).toString();
+    const password_hash = SHA256(password).toString();
     
     const res = await fetch("https://dev.bharathbots.com/webhook/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password: hashedPassword }),
+      body: JSON.stringify({ email, password_hash }),
     });
 
     const data = await res.json().catch(() => ({}));
