@@ -10,7 +10,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { apiPost } from "@/utils/apiClient";
 
 interface CustomerData {
   customer_id?: string;
@@ -55,30 +54,54 @@ export function CustomerModal({ open, onOpenChange, customer, onSuccess }: Props
       return;
     }
     setLoading(true);
+    const token = localStorage.getItem("auth_token");
+    if (!token) {
+      toast.error("Not authenticated");
+      setLoading(false);
+      return;
+    }
     try {
-      if (isEdit) {
-        await apiPost("/webhook/edit-customer", {
-          customer_id: form.customer_id,
-          name: form.name,
-          phone: form.phone,
-          email: form.email,
-          tags: form.tags,
-        });
-        toast.success("Customer updated");
-      } else {
-        const res = await apiPost("/webhook/register-customer", {
-          name: form.name,
-          phone: form.phone,
-          email: form.email,
-          tags: form.tags,
-        });
-        if (res?.message?.toLowerCase().includes("already exists")) {
-          toast.error("Customer already exists");
-          setLoading(false);
-          return;
-        }
-        toast.success("Customer created");
+      const endpoint = isEdit
+        ? "https://dev.bharathbots.com/webhook/edit-customer"
+        : "https://dev.bharathbots.com/webhook/register-customer";
+
+      const body = isEdit
+        ? {
+            customer_id: form.customer_id,
+            name: form.name,
+            phone: form.phone,
+            email: form.email,
+            tags: form.tags,
+          }
+        : {
+            name: form.name,
+            phone: form.phone,
+            email: form.email,
+            tags: form.tags,
+          };
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Request failed");
       }
+
+      if (!isEdit && data?.message?.toLowerCase().includes("already exists")) {
+        toast.error("Customer already exists");
+        setLoading(false);
+        return;
+      }
+
+      toast.success(isEdit ? "Customer updated" : "Customer created");
       onSuccess();
       onOpenChange(false);
     } catch (err: any) {
