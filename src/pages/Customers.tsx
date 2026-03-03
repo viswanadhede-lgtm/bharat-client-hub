@@ -57,17 +57,11 @@ export default function Customers() {
         }),
       });
 
-      const data = await response.json();
+      const result = await response.json();
 
-      if (Array.isArray(data)) {
-        setCustomers(data);
-      } else if (data?.success !== undefined) {
-        setCustomers(data.data || []);
-        setTotalPages(data.total_pages || 1);
-      } else {
-        setCustomers(data.customers || data.data || []);
-        setTotalPages(data.total_pages || 1);
-      }
+      const customers = result[0]?.data || [];
+      setCustomers(customers);
+      setTotalPages(result[0]?.total_pages || 1);
     } catch (err: any) {
       toast.error(err.message || "Failed to load customers");
     } finally {
