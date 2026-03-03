@@ -73,7 +73,7 @@ export function CustomerModal({ open, onOpenChange, customer, onSuccess }: Props
 
     try {
       const endpoint = isEdit
-        ? "https://dev.bharathbots.com/webhook/edit-customer"
+        ? "https://dev.bharathbots.com/webhook-test/edit-customer"
         : "https://dev.bharathbots.com/webhook/register-customer";
 
       const body = isEdit
@@ -133,7 +133,7 @@ export function CustomerModal({ open, onOpenChange, customer, onSuccess }: Props
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>{isEdit ? "Edit Customer" : "Add Customer"}</DialogTitle>
         </DialogHeader>
