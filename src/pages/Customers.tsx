@@ -37,14 +37,37 @@ export default function Customers() {
   const fetchCustomers = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await apiPost("/webhook/get-customers", {
-        status: status === "all" ? undefined : status,
-        search: search || undefined,
-        page,
-        limit,
+      const token = localStorage.getItem("auth_token");
+      if (!token) {
+        window.location.href = "/login";
+        return;
+      }
+
+      const response = await fetch("https://dev.bharathbots.com/webhook/get-customers", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          status: status === "all" ? undefined : status,
+          search: search || undefined,
+          page,
+          limit,
+        }),
       });
-      setCustomers(res.customers || res.data || []);
-      setTotalPages(res.total_pages || 1);
+
+      const data = await response.json();
+
+      if (Array.isArray(data)) {
+        setCustomers(data);
+      } else if (data?.success !== undefined) {
+        setCustomers(data.data || []);
+        setTotalPages(data.total_pages || 1);
+      } else {
+        setCustomers(data.customers || data.data || []);
+        setTotalPages(data.total_pages || 1);
+      }
     } catch (err: any) {
       toast.error(err.message || "Failed to load customers");
     } finally {
