@@ -66,7 +66,7 @@ export function CustomerModal({ open, onOpenChange, customer, onSuccess }: Props
         });
         toast.success("Customer updated");
       } else {
-        const res = await apiPost("/webhook/customer-engine", {
+        const res = await apiPost("/webhook/register-customer", {
           name: form.name,
           phone: form.phone,
           email: form.email,
