@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { AuthUser, getUser, getToken, storeAuth, clearAuth, isAuthenticated, AuthResponse } from "@/utils/auth";
+import { AuthUser, getUser, isAuthenticated, storeAuth, clearAuth } from "@/utils/auth";
 import SHA256 from "crypto-js/sha256";
 
 interface AuthContextType {
@@ -25,7 +25,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     const password_hash = SHA256(password).toString();
-    
+
     const res = await fetch("https://dev.bharathbots.com/webhook/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -34,12 +34,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const data = await res.json().catch(() => ({}));
 
-    if (!res.ok || data.success === false) {
+    if (!res.ok || data.success !== true) {
       throw new Error(data.message || "Invalid credentials");
     }
 
-    storeAuth(data as AuthResponse);
-    setUser(data.user);
+    // Store token and decode user from it
+    storeAuth(data.token);
+    setUser(getUser());
   };
 
   const logout = () => {
