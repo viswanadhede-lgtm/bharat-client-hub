@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, LogOut } from "lucide-react";
+import { Users, LogOut } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/sidebar";
 
 const navItems = [
-  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Customers", url: "/customers", icon: Users },
 ];
 
