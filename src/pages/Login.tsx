@@ -23,7 +23,7 @@ export default function Login() {
     setLoading(true);
     try {
       await login(email, password);
-      navigate("/dashboard");
+      navigate("/customers");
     } catch (err: any) {
       toast.error(err.message || "Login failed");
     } finally {
