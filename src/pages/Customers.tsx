@@ -59,7 +59,10 @@ export default function Customers() {
 
       const result = await response.json();
 
-      const customers = result[0]?.data || [];
+      const allCustomers = result[0]?.data || [];
+      const customers = status === "all"
+        ? allCustomers.filter((c: Customer) => c.status !== "deleted")
+        : allCustomers;
       setCustomers(customers);
       setTotalPages(result[0]?.total_pages || 1);
     } catch (err: any) {
