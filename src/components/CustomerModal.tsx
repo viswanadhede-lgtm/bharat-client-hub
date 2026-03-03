@@ -73,7 +73,7 @@ export function CustomerModal({ open, onOpenChange, customer, onSuccess }: Props
 
     try {
       const endpoint = isEdit
-        ? "https://dev.bharathbots.com/webhook-test/edit-customer"
+        ? "https://dev.bharathbots.com/webhook/edit-customer"
         : "https://dev.bharathbots.com/webhook/register-customer";
 
       const body = isEdit
