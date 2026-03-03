@@ -41,12 +41,12 @@ export function CustomerModal({ open, onOpenChange, customer, onSuccess }: Props
   useEffect(() => {
     if (customer) {
       setForm({
-        name: customer.name || "",
-        phone: customer.phone || "",
-        email: customer.email || "",
-        tags: customer.tags || "",
+        name: String(customer.name ?? ""),
+        phone: String(customer.phone ?? ""),
+        email: String(customer.email ?? ""),
+        tags: String(customer.tags ?? ""),
         customer_id: customer.customer_id,
-        status: customer.status || "active",
+        status: customer.status === "inactive" ? "inactive" : "active",
       });
     } else {
       setForm({ name: "", phone: "", email: "", tags: "", status: "active" });
@@ -56,7 +56,13 @@ export function CustomerModal({ open, onOpenChange, customer, onSuccess }: Props
   const handleUpdate = async () => {
     console.log("[CustomerModal] Update clicked", { isEdit, form });
 
-    if (!form.name.trim() || !form.phone.trim()) {
+    const name = String(form.name ?? "").trim();
+    const phone = String(form.phone ?? "").trim();
+    const email = String(form.email ?? "").trim();
+    const tags = String(form.tags ?? "").trim();
+    const status = form.status === "inactive" ? "inactive" : "active";
+
+    if (!name || !phone) {
       toast.error("Name and Phone are required");
       return;
     }
@@ -79,17 +85,17 @@ export function CustomerModal({ open, onOpenChange, customer, onSuccess }: Props
       const body = isEdit
         ? {
             customer_id: form.customer_id,
-            name: form.name,
-            phone: form.phone,
-            email: form.email,
-            tags: form.tags,
-            status: form.status,
+            name,
+            phone,
+            email,
+            tags,
+            status,
           }
         : {
-            name: form.name,
-            phone: form.phone,
-            email: form.email,
-            tags: form.tags,
+            name,
+            phone,
+            email,
+            tags,
           };
 
       console.log("[CustomerModal] Calling endpoint:", endpoint, "Body:", JSON.stringify(body));
@@ -140,19 +146,19 @@ export function CustomerModal({ open, onOpenChange, customer, onSuccess }: Props
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Name *</Label>
-            <Input id="name" value={form.name} onChange={(e) => update("name", e.target.value)} placeholder="Full name" />
+            <Input id="name" value={String(form.name ?? "")} onChange={(e) => update("name", e.target.value)} placeholder="Full name" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="phone">Phone *</Label>
-            <Input id="phone" value={form.phone} onChange={(e) => update("phone", e.target.value)} placeholder="+91 9876543210" />
+            <Input id="phone" value={String(form.phone ?? "")} onChange={(e) => update("phone", e.target.value)} placeholder="+91 9876543210" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="email@example.com" />
+            <Input id="email" type="email" value={String(form.email ?? "")} onChange={(e) => update("email", e.target.value)} placeholder="email@example.com" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="tags">Tags</Label>
-            <Input id="tags" value={form.tags || ""} onChange={(e) => update("tags", e.target.value)} placeholder="VIP, Regular" />
+            <Input id="tags" value={String(form.tags ?? "")} onChange={(e) => update("tags", e.target.value)} placeholder="VIP, Regular" />
           </div>
           {isEdit && (
             <div className="space-y-2">
