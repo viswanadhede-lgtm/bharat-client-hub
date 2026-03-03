@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, LogOut, Scissors } from "lucide-react";
+import { LayoutDashboard, Users, LogOut } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -32,8 +32,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon" className="border-r-0">
-      <div className="flex h-14 items-center gap-2 px-4 border-b border-sidebar-border">
-        <Scissors className="h-6 w-6 text-sidebar-primary shrink-0" />
+      <div className="flex h-14 items-center px-4 border-b border-sidebar-border">
         {!collapsed && (
           <span className="text-sm font-semibold text-sidebar-accent-foreground tracking-tight">
             Bharatbots
