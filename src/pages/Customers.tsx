@@ -17,6 +17,11 @@ import {
 import { Plus, Search } from "lucide-react";
 import { toast } from "sonner";
 
+interface Branch {
+  branch_id: string;
+  branch_name: string;
+}
+
 export default function Customers() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,6 +31,10 @@ export default function Customers() {
   const [totalPages, setTotalPages] = useState(1);
   const limit = 10;
 
+  // Branch state
+  const [branches, setBranches] = useState<Branch[]>([]);
+  const [selectedBranchId, setSelectedBranchId] = useState<string>("");
+
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
   const [editCustomer, setEditCustomer] = useState<Customer | null>(null);
@@ -34,7 +43,36 @@ export default function Customers() {
   const [deleteTarget, setDeleteTarget] = useState<Customer | null>(null);
   const [deleting, setDeleting] = useState(false);
 
+  // Fetch branches on mount
+  useEffect(() => {
+    const fetchBranches = async () => {
+      try {
+        const token = localStorage.getItem("auth_token");
+        if (!token) return;
+        const res = await fetch("https://dev.bharathbots.com/webhook/get-active-branches", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+          body: JSON.stringify({}),
+        });
+        const raw = await res.json();
+        const data = Array.isArray(raw) ? raw[0] : raw;
+        const list: Branch[] = data?.branches || data?.data || raw || [];
+        if (Array.isArray(list) && list.length > 0) {
+          setBranches(list);
+          setSelectedBranchId(list[0].branch_id);
+        }
+      } catch (err: any) {
+        toast.error("Failed to load branches");
+      }
+    };
+    fetchBranches();
+  }, []);
+
   const fetchCustomers = useCallback(async () => {
+    if (!selectedBranchId) return;
     setLoading(true);
     try {
       const token = localStorage.getItem("auth_token");
@@ -50,6 +88,7 @@ export default function Customers() {
           "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify({
+          branch_id: selectedBranchId,
           status: status === "all" ? undefined : status,
           search: search || undefined,
           page,
@@ -70,7 +109,7 @@ export default function Customers() {
     } finally {
       setLoading(false);
     }
-  }, [search, status, page]);
+  }, [search, status, page, selectedBranchId]);
 
   useEffect(() => {
     fetchCustomers();
