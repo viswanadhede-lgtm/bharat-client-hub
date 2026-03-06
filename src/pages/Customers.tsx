@@ -99,9 +99,13 @@ export default function Customers() {
       const result = await response.json();
 
       const allCustomers = result[0]?.data || [];
+      // Client-side branch filter as backend may not filter by branch_id
+      const branchFiltered = allCustomers.filter(
+        (c: Customer) => !c.branch_id || c.branch_id === selectedBranchId
+      );
       const customers = status === "all"
-        ? allCustomers.filter((c: Customer) => c.status !== "deleted")
-        : allCustomers;
+        ? branchFiltered.filter((c: Customer) => c.status !== "deleted")
+        : branchFiltered;
       setCustomers(customers);
       setTotalPages(result[0]?.total_pages || 1);
     } catch (err: any) {

@@ -13,6 +13,7 @@ import { Link } from "react-router-dom";
 
 export interface Customer {
   customer_id: string;
+  branch_id?: string;
   name: string;
   phone: string;
   email: string;
