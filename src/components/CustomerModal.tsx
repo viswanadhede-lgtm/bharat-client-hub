@@ -117,13 +117,14 @@ export function CustomerModal({ open, onOpenChange, customer, onSuccess }: Props
         throw new Error(data.message || "Request failed");
       }
 
-      if (!isEdit && data?.message?.toLowerCase().includes("already exists")) {
-        toast.error("Customer already exists");
+      if (!isEdit && data?.status === "existing") {
+        toast.error(`Customer already exists\nCustomer ID: ${data.customer_id || "N/A"}`, { duration: 5000 });
         setLoading(false);
         return;
       }
 
-      toast.success(isEdit ? "Customer updated" : "Customer created");
+      const customerId = data?.customer_id || "";
+      toast.success(isEdit ? "Customer updated" : `Customer created successfully\nCustomer ID: ${customerId}`, { duration: 5000 });
       onSuccess();
       onOpenChange(false);
     } catch (err: any) {
