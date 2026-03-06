@@ -118,7 +118,10 @@ export function CustomerModal({ open, onOpenChange, customer, onSuccess }: Props
       }
 
       if (!isEdit && data?.status === "existing") {
-        toast.error(`Customer already exists\nCustomer ID: ${data.customer_id || "N/A"}`, { duration: 5000 });
+        toast.error("Customer already exists", {
+          description: `Customer ID: ${data.customer_id || "N/A"}`,
+          duration: 5000,
+        });
         setLoading(false);
         return;
       }
