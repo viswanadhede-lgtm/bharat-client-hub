@@ -149,9 +149,25 @@ export default function Customers() {
           <h1 className="text-2xl font-semibold tracking-tight">Customers</h1>
           <p className="text-sm text-muted-foreground mt-1">Manage your salon customers</p>
         </div>
-        <Button onClick={handleCreate}>
-          <Plus className="h-4 w-4 mr-2" /> Add Customer
-        </Button>
+        <div className="flex items-center gap-3">
+          {branches.length > 0 && (
+            <Select value={selectedBranchId} onValueChange={(v) => { setSelectedBranchId(v); setPage(1); }}>
+              <SelectTrigger className="w-full sm:w-52">
+                <SelectValue placeholder="Select Branch" />
+              </SelectTrigger>
+              <SelectContent>
+                {branches.map((b) => (
+                  <SelectItem key={b.branch_id} value={b.branch_id}>
+                    {b.branch_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+          <Button onClick={handleCreate}>
+            <Plus className="h-4 w-4 mr-2" /> Add Customer
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}
