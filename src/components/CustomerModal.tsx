@@ -128,7 +128,10 @@ export function CustomerModal({ open, onOpenChange, customer, onSuccess }: Props
       }
 
       const customerId = data?.customer_id || "";
-      toast.success(isEdit ? "Customer updated" : `Customer created successfully\nCustomer ID: ${customerId}`, { duration: 5000 });
+      toast.success(isEdit ? "Customer updated" : "Customer created successfully", {
+        description: customerId ? `Customer ID: ${customerId}` : undefined,
+        duration: 5000,
+      });
       onSuccess();
       onOpenChange(false);
     } catch (err: any) {
