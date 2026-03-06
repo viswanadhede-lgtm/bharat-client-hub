@@ -110,7 +110,8 @@ export function CustomerModal({ open, onOpenChange, customer, onSuccess }: Props
       });
 
       console.log("[CustomerModal] Response status:", res.status);
-      const data = await res.json();
+      const raw = await res.json();
+      const data = Array.isArray(raw) ? raw[0] : raw;
       console.log("[CustomerModal] Response data:", JSON.stringify(data));
 
       if (!res.ok) {
